@@ -141,6 +141,17 @@ class Consumable extends SnipeModel
     }
 
     /**
+     * Establishes the component -> replenish assignments relationship
+     *
+     * @author [A. Rahardianto] [<veenone@gmail.com>]
+     * @since [v6.0]
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     */
+    public function consumableReplenishAssignments()
+    {
+        return $this->hasMany(\App\Models\ConsumableReplenishAssignment::class);
+    }
+    /**
      * Establishes the component -> company relationship
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
@@ -229,6 +240,18 @@ class Consumable extends SnipeModel
         return $this->belongsToMany(\App\Models\User::class, 'consumables_users', 'consumable_id', 'assigned_to')->withPivot('user_id')->withTrashed()->withTimestamps();
     }
 
+    
+    /**
+     * Establishes the consumables_stock -> users relationship
+     *
+     * @author [A. Rahardianto] [<veenone@gmail.com>]
+     * @since [v6.0]
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     */
+    public function replenishusers()
+    {
+        return $this->belongsToMany(\App\Models\User::class, 'consumables_stock', 'consumable_id', 'total_replenish')->withPivot('id', 'user_id','order_number','file')->withTrashed()->withTimestamps();
+    }
 
     /**
      * Determine whether to send a checkin/checkout email based on
@@ -291,6 +314,43 @@ class Consumable extends SnipeModel
 
         return $remaining;
     }
+
+
+
+    
+    /**
+     * Gets the number of consumed consumables
+     *
+     * @author [A. Rahardianto] [<veenone@gmail.com>]
+     * @since [v.5.5]
+     * @return int
+     */
+    public function numConsumed()
+    {
+        $checkedouttotal = null;        
+        foreach($this->users as $data){
+                $totalnum = $data['pivot']['totalnum'];
+                $checkedouttotal += $totalnum;            
+        }        
+        
+        return $checkedouttotal;
+    }
+
+    
+    /**
+     * Gets the number of checked out consumables
+     *
+     * @author [A. Rahardianto] [<veenone@gmail.com>]
+     * @since [v.5.5]
+     * @return int
+     */
+    public function checkoutTotal()
+    {
+        $checkedout = $this->users->count();
+        
+        return $checkedout;
+    }
+  
 
     /**
      * Query builder scope to order on company

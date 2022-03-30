@@ -308,7 +308,21 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
     public function consumables()
     {
         return $this->belongsToMany(\App\Models\Consumable::class, 'consumables_users', 'assigned_to', 'consumable_id')->withPivot('id')->withTrashed();
+        
     }
+
+     /**
+     * Establishes the user -> consumable replenish relationship
+     *
+     * @author [A. Rahardianto] [<veenone@gmail.com>]
+     * @since [v6.0]
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     */
+    public function replenishconsumables()
+    {
+        return $this->belongsToMany(\App\Models\Consumable::class, 'consumables_stock', 'user_id', 'consumable_id')->withPivot('id','created_at','initial_qty','total_replenish','order_number','replenishnote')->withTrashed();
+    }
+
 
     /**
      * Establishes the user -> license seats relationship

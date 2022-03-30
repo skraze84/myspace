@@ -540,7 +540,6 @@
                             @endif 
                   @endif
                     
-
                     @if ($user->notes)
                      <!-- empty -->
                      <div class="row">
@@ -557,12 +556,8 @@
 
                   </div> <!--/end striped container-->
                 </div> <!-- end col-md-9 -->
-   
-            
-            
           </div> <!--/.row-->
         </div><!-- /.tab-pane -->
-
 
         <div class="tab-pane" id="asset">
           <!-- checked out assets table -->
@@ -706,6 +701,7 @@
 
         <div class="tab-pane" id="consumables">
           <div class="table-responsive">
+          <h2 class="box-title">{{ trans('general.checkout_history') }}</h2>
             <table
                     data-cookie-id-table="userConsumableTable"
                     data-id-table="userConsumableTable"
@@ -731,7 +727,7 @@
                   <th class="col-md-4">{{ trans('general.date') }}</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody>                
                 @foreach ($user->consumables as $consumable)
                 <tr>
                   <td>{!! $consumable->present()->nameUrl() !!}</td>
@@ -743,6 +739,71 @@
                 @endforeach
               </tbody>
           </table>
+          </div>
+          <hr>
+          <!-- Replenishment list -->
+          <div class="box-body">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="table table-responsive">
+                  <h2 class="box-title">{{ trans('general.replenish_history') }}</h2>
+                  <table
+                          data-cookie-id-table="consumablesReplenishmentTable"
+                          data-pagination="true"
+                          data-id-table="consumablesReplenishmentTable"
+                          data-search="false"
+                          data-side-pagination="client"
+                          data-show-columns="true"
+                          data-show-export="true"
+                          data-show-footer="true"
+                          data-show-refresh="true"
+                          data-sort-order="desc"
+                          data-sort-name="name"
+                          id="consumablesReplenishmentTable"
+                          class="table table-striped snipe-table"                          
+                          data-export-options='{
+                    "fileName": "export-consumables-{{ str_slug($user->username) }}-replenish-{{ date('Y-m-d') }}",
+                    "ignoreColumn": ["actions","image","change","checkbox","checkincheckout","icon"]
+                    }'>
+                    <thead>
+                      <tr>
+                        <th data-searchable="false" data-sortable="false" data-field="created_at" >{{ trans('general.date') }}</th>
+                        <th data-searchable="false" data-sortable="false" data-field="initial_qty">{{ trans('admin/consumables/general.initial_qty') }}</th>
+                        <th data-searchable="false" data-sortable="false" data-field="total_replenish">{{ trans('admin/consumables/general.totalreplenish') }}</th>
+                        <th data-searchable="false" data-sortable="false" data-field="order_number">{{ trans('general.order_number') }}</th>
+                        <th data-searchable="false" data-sortable="false" data-field="replenishnote">{{ trans('admin/consumables/general.replenishnote') }}</th>                    
+                        <th data-searchable="false" data-sortable="false" data-field="admin">{{ trans('general.admin') }}</th>
+                      </tr>
+                    </thead>
+                    <tbody>                    
+                      <!-- {{$user}} -->
+                @foreach ($user->replenishconsumables as $replenishconsumable)                     
+                <tr>                  
+                  <td>
+                    {{$replenishconsumable->pivot->created_at}}                    
+                  </td>
+                  <td>
+                    {{$replenishconsumable->pivot->initial_qty}}
+                  </td>
+                  <td>
+                    {{$replenishconsumable->pivot->total_replenish}}
+                  </td>
+                  <td>
+                    {{$replenishconsumable->pivot->order_number ?  $replenishconsumable->pivot->order_number : 'N/A'}}
+                  </td>
+                  <td>
+                    {{$replenishconsumable->pivot->replenishnote ? $replenishconsumable->pivot->replenishnote : '-'}}
+                  </td>
+                  <td>
+                    {{$user->username}}
+                  </td>
+                </tr>
+                @endforeach
+              </tbody>
+                  </table>
+                </div>
+              </div> <!-- /.col-md-12-->
+            </div>
           </div>
         </div><!-- /consumables-tab -->
 
