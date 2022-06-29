@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Licenses\LicensesController;
 use App\Http\Transformers\LicenseSeatsTransformer;
 use App\Models\Asset;
 use App\Models\License;
@@ -145,4 +146,6 @@ class LicenseSeatsController extends Controller
 
         return Helper::formatStandardApiResponse('error', null, $licenseSeat->getErrors());
     }
+
+
 }

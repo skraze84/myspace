@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Licenses;
 
 use App\Events\CheckoutableCheckedIn;
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\License;
 use App\Models\LicenseSeat;
@@ -105,5 +106,50 @@ class LicenseCheckinController extends Controller
 
         // Redirect to the license page with error
         return redirect()->route('licenses.index')->with('error', trans('admin/licenses/message.checkin.error'));
+    }
+
+    public function checkinCount($license_id){
+        $licenseSeats = LicenseSeat::where('license_id', '=', $license_id)
+            ->whereNotNull('assigned_to')
+            ->with('user')
+            ->get();
+        return ($licenseSeats->count());
+
+    }
+
+    public function checkinAllLicenseSeats($license_id)
+    {
+
+        $this->authorize('edit', LicenseSeat::class);
+
+        $licenseSeats = LicenseSeat::where('license_id', '=', $license_id)
+            ->whereNotNull('assigned_to')
+            ->with('user')
+            ->get();
+
+        if($licenseSeats->count()==0){
+            return redirect()->to('licenses/')->with('error', 'There are no seats checked out.');
+
+        }
+
+        if (!License::where('id', '=', $license_id)->first()) {
+
+            return redirect()->to('licenses/')->with('error', 'Invalid license ID.');
+        }
+
+        foreach ($licenseSeats as $seat) {
+            $seat->assigned_to = null;
+
+            if ($seat->save()) {
+                // Override the email address so we don't notify on checkin
+                $seat->user->email = null;
+
+                // Log the checkin
+                $seat->logCheckin($seat->user, 'Checked in via UI');
+            }
+
+        }
+
+        return redirect()->to('licenses/')->with('success', 'All seats checked in');
     }
 }

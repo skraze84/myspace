@@ -5,6 +5,7 @@ use App\Http\Controllers\Api;
 use Illuminate\Support\Facades\Route;
 
 
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -594,8 +595,7 @@ Route::group(['prefix' => 'v1', 'middleware' => ['api', 'throttle:api']], functi
                 'selectlist'
             ]
         )->name('api.licenses.selectlist');
-
-        }); 
+        });
 
         Route::resource('licenses', 
         Api\LicensesController::class,

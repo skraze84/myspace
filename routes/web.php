@@ -19,6 +19,7 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StatuslabelsController;
 use App\Http\Controllers\SuppliersController;
 use App\Http\Controllers\ViewAssetsController;
+use App\Http\Controllers\Licenses\LicenseCheckinController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -259,7 +260,6 @@ Route::group(['prefix' => 'account', 'middleware' => ['auth']], function () {
         'accept-asset/{logID}',
         [ViewAssetsController::class, 'getAcceptAsset']
     )->name('account/accept-assets');
-
     // Profile
     Route::get(
         'requestable-assets',
@@ -316,6 +316,10 @@ Route::group(['middleware' => ['auth']], function () {
         'reports/export/licenses',
         [ReportsController::class, 'exportLicenseReport']
     )->name('reports/export/licenses');
+    Route::post(
+        '{licenseID}/checkin-all',
+        [LicenseCheckinController::class, 'checkinAllLicenseSeats']
+    )->name('licenseseat.checkin-all');
 
     Route::get('reports/accessories', [ReportsController::class, 'getAccessoryReport'])->name('reports/accessories');
     Route::get(
