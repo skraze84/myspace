@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Events\AssetCheckedOut;
+use App\Events\CheckoutableCheckedIn;
 use App\Events\CheckoutableCheckedOut;
 use App\Exceptions\CheckoutNotAllowed;
 use App\Http\Traits\UniqueSerialTrait;
@@ -296,6 +297,7 @@ class Asset extends Depreciable
      * @param Carbon $expected_checkin
      * @param string $note
      * @param null $name
+     * @param null $location
      * @return bool
      * @since [v3.0]
      * @return bool
@@ -344,6 +346,82 @@ class Asset extends Depreciable
             event(new CheckoutableCheckedOut($this, $target, $checkedOutBy, $note));
 
             $this->increment('checkout_counter', 1);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks the asset in to the target
+     *
+     * @TODO I removed the admin variable when writing this, because it is still unused down here too. Does it need to be added again?
+     *
+     * @author [A. Janes] [<ajanes@adagiohealth.org>]
+     * @param Carbon $checkin_at
+     * @param string $note
+     * @param null $name
+     * @param null $location
+     * @return bool
+     * @since
+     * @return bool
+     */
+    public function checkIn($checkin_at = null, $note = null, $name = null, $location = null)
+    {
+        if (is_null($target = $this->assigned_to)) {
+            return false;
+        }
+
+        $this->expected_checkin = null;
+
+        $this->last_checkout = null;
+
+        $this->assignedTo()->disassociate();
+
+        $this->accepted = null;
+
+        if ($name != null) {
+            $this->name = $name;
+        }
+
+        if ($checkin_at == null) {
+            $checkin_at = date('Y-m-d');
+        }
+
+        // This is just meant to correct legacy issues where some user data would have 0
+        // as a location ID, which isn't valid. Later versions of Snipe-IT have stricter validation
+        // rules, so it's necessary to fix this for long-time users. It's kinda gross, but will help
+        // people (and their data) in the long run
+
+        if ($this->rtd_location_id == '0') {
+            \Log::debug('Manually override the RTD location IDs');
+            \Log::debug('Original RTD Location ID: '.$this->rtd_location_id);
+            $this->rtd_location_id = '';
+            \Log::debug('New RTD Location ID: '.$this->rtd_location_id);
+        }
+
+        if ($this->location_id == '0') {
+            \Log::debug('Manually override the location IDs');
+            \Log::debug('Original Location ID: '.$this->location_id);
+            $this->location_id = '';
+            \Log::debug('New RTD Location ID: '.$this->location_id);
+        }
+
+        $this->location_id = $this->rtd_location_id;
+        \Log::debug('After Location ID: '.$this->location_id);
+        \Log::debug('After RTD Location ID: '.$this->rtd_location_id);
+
+        if ($location != null) {
+            $this->location_id = $location;
+        } else {
+            $this->location_id = $this->rtd_location_id;
+        }
+
+        if ($this->save()) {
+            event(new CheckoutableCheckedIn($this, $target, Auth::user(), $note, $checkin_at));
+
+            $this->increment('checkin_counter', 1);
 
             return true;
         }
