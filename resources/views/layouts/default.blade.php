@@ -87,6 +87,7 @@
   @else
       <body class="sidebar-mini skin-{{ $snipeSettings->skin!='' ? $snipeSettings->skin : 'blue' }} {{ (session('menu_state')!='open') ? 'sidebar-mini sidebar-collapse' : ''  }}">
   @endif
+  
 
   <a class="skip-main" href="#main">Skip to main content</a>
     <div class="wrapper">
@@ -731,11 +732,39 @@
             @endcan
 
             @can('viewRequestable', \App\Models\Asset::class)
-            <li{!! (Request::is('account/requestable-assets') ? ' class="active"' : '') !!}>
-            <a href="{{ route('requestable-assets') }}">
-            <i class="fa fa-laptop fa-fw"></i>
-            <span>{{ trans('admin/hardware/general.requestable') }}</span>
-            </a>
+            <li class="treeview{{ (Request::is('requests*') ? ' active' : '') }}">
+                <a href="#"  class="dropdown-toggle">
+                    <i class="fa fa-circle-question"></i>
+                    <span>{{ trans('general.requests') }}</span>
+                    <i class="fa fa-angle-left pull-right"></i>
+                </a>
+                <ul  class="treeview-menu">
+                    <li{!! (Request::is('account/requestable-assets') ? ' class="active"' : '') !!}>
+                        <a href="{{ route('requestable-assets') }}">
+                            <i class="fa fa-laptop fa-fw"></i>
+                            <span>{{ trans('admin/hardware/general.requestable') }}</span>  
+                        </a>
+                    </li>
+                    <li{!! (Request::is('account/reserve-assets') ? ' class="active"' : '') !!}>
+                        <a href="{{ route('reserve-assets') }}">
+                            <i class="fa fa-calendar-day fa-fw"></i>
+                            <span>{{ trans('admin/hardware/general.reservation') }}</span>
+                        </a>
+                    </li>
+                    <li{!! (Request::is('account/index') ? ' class="active"' : '') !!}>
+                        <a href="{{ route('tasks.index') }}">
+                            <i class="fa fa-calendar-day fa-fw"></i>
+                            <span>{{ trans('admin/hardware/general.tasks') }}</span>
+                        </a>
+                    </li>
+                    <li{!! (Request::is('account/create') ? ' class="active"' : '') !!}>
+                        <a href="{{ route('tasks.create') }}">
+                            <i class="fa fa-calendar-day fa-fw"></i>
+                            <span>{{ trans('admin/hardware/general.createtasks') }}</span>
+                        </a>
+                    </li>
+                </ul>
+                
             </li>
             @endcan
 

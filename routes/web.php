@@ -22,6 +22,7 @@ use App\Http\Controllers\ViewAssetsController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\TasksController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -110,6 +111,10 @@ Route::group(['middleware' => 'auth'], function () {
 
 Route::group(['middleware' => 'auth', 'prefix' => 'modals'], function () {
     Route::get('{type}/{itemId?}', [ModalController::class, 'show'] )->name('modal.show');
+});
+
+Route::group(['middleware' => 'auth', 'prefix' => 'modals'], function () {
+    Route::get('reserve/{id}', [ModalController::class, 'show'] )->name('reservation.show');
 });
 
 /*
@@ -268,6 +273,31 @@ Route::group(['prefix' => 'account', 'middleware' => ['auth']], function () {
         'request/{itemType}/{itemId}',
         [ViewAssetsController::class, 'getRequestItem']
     )->name('account/request-item');
+
+    Route::get(
+        'reserve-assets',
+        [ViewAssetsController::class, 'getReservableIndex']
+    )->name('reserve-assets');
+
+    Route::post(
+        'reserve/{itemType}/{itemId}',
+        [ViewAssetsController::class, 'getReserveItem']
+    )->name('account/reserve-item');
+
+    Route::get(
+        'index', 
+        [TasksController::class, 'index']
+    )->name('tasks.index');
+
+    Route::get(
+        'create', 
+        [TasksController::class, 'create']
+    )->name('tasks.create');
+    
+    Route::post(
+        'store', 
+        [TasksController::class, 'store']
+    )->name('tasks/store');
 
     // Account Dashboard
     Route::get('/', [ViewAssetsController::class, 'getIndex'])->name('account');
