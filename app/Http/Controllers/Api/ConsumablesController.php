@@ -290,6 +290,8 @@ class ConsumablesController extends Controller
                 ]
             );
 
+            $consumable->newQuery()->where(['id' => $consumable->id])->update(['qty' => $consumable->qty - 1]);
+
             // Log checkout event
             $logaction = $consumable->logCheckout($request->input('note'), $user);
             $data['log_id'] = $logaction->id;
