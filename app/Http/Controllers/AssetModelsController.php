@@ -8,6 +8,7 @@ use App\Models\Actionlog;
 use App\Models\Asset;
 use App\Models\AssetModel;
 use App\Models\CustomField;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -58,7 +59,8 @@ class AssetModelsController extends Controller
 
         return view('models/edit')->with('category_type', 'asset')
             ->with('depreciation_list', Helper::depreciationList())
-            ->with('item', new AssetModel);
+            ->with('item', new AssetModel)
+            ->with('setting', Setting::getSettings());
     }
 
     /**
@@ -123,7 +125,8 @@ class AssetModelsController extends Controller
         if ($item = AssetModel::find($modelId)) {
             $category_type = 'asset';
             $view = View::make('models/edit', compact('item', 'category_type'));
-            $view->with('depreciation_list', Helper::depreciationList());
+            $view->with('depreciation_list', Helper::depreciationList())
+            ->with('setting', Setting::getSettings());
 
             return $view;
         }
